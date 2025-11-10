@@ -1,0 +1,32 @@
+[
+  {
+    "KTLO Item": "Sample Task: AWS Lambda Node.js 18 EOL",
+    "Received On": 45200,
+    "Triaged": "Yes",
+    "Action Needed from CCS": "Yes",
+    "Status": "In Progress",
+    "PgM Assigned": "Your Name",
+    "Due Date": 45300,
+    "Comments": "Sample task for demonstration. Update to Node.js 20. Tracking: JIRA-123"
+  },
+  {
+    "KTLO Item": "Sample Task: EKS Cluster Upgrade to 1.28",
+    "Received On": 45210,
+    "Triaged": "Yes",
+    "Action Needed from CCS": "No",
+    "Status": "Completed",
+    "PgM Assigned": "Your Name",
+    "Due Date": 45250,
+    "Comments": "Sample completed task. Upgraded successfully."
+  },
+  {
+    "KTLO Item": "Sample Task: RDS PostgreSQL 13 Deprecation",
+    "Received On": 45220,
+    "Triaged": "No",
+    "Action Needed from CCS": "Yes",
+    "Status": "Not Started",
+    "PgM Assigned": "Team Member",
+    "Due Date": 45350,
+    "Comments": "Sample task. Plan migration to PostgreSQL 15."
+  }
+]
