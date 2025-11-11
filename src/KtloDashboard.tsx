@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import {
-  BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer
 } from 'recharts';
 import {
   CheckCircle2, AlertTriangle, TrendingUp, Calendar, Filter, Search,
   ExternalLink, X, Clock, Users, FileText, Activity,
-  CheckSquare, Target, Zap, ArrowUpRight, ArrowDownRight, BarChart3
+  CheckSquare, Target, Zap, ArrowUpRight, BarChart3
 } from 'lucide-react';
 import ktloData from './ktlo-data.json';
 
@@ -60,6 +60,20 @@ const getAllFiscalYears = (data: KTLOItem[]): string[] => {
   return Array.from(years).sort().reverse();
 };
 
+const getFiscalYearDetails = (fy: string): { year: number; displayYear: string; startMonth: string; endMonth: string } => {
+  if (fy === 'All') {
+    return { year: 0, displayYear: 'All Years', startMonth: '', endMonth: '' };
+  }
+  const yearNum = parseInt(fy.replace('FY', ''));
+  const fullYear = yearNum < 50 ? 2000 + yearNum : 1900 + yearNum;
+  return {
+    year: fullYear,
+    displayYear: `Financial Year ${fullYear}`,
+    startMonth: `Aug ${fullYear - 1}`,
+    endMonth: `Jul ${fullYear}`
+  };
+};
+
 const getUrgencyLevel = (item: KTLOItem): 'overdue' | 'urgent' | 'soon' | 'normal' => {
   if (item.Status === 'Completed') return 'normal';
   if (typeof item['Due Date'] !== 'number') return 'normal';
@@ -76,7 +90,7 @@ const getUrgencyLevel = (item: KTLOItem): 'overdue' | 'urgent' | 'soon' | 'norma
 
 const KtloDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set(['Completed', 'In Progress', 'Not Started']));
   const [fiscalYearFilter, setFiscalYearFilter] = useState<string>('FY26');
   const [selectedItem, setSelectedItem] = useState<KTLOItem | null>(null);
   const [drillDownData, setDrillDownData] = useState<{
@@ -85,6 +99,16 @@ const KtloDashboard: React.FC = () => {
   } | null>(null);
 
   const allFiscalYears = useMemo(() => getAllFiscalYears(ktloData as KTLOItem[]), []);
+
+  const toggleStatusFilter = (status: string) => {
+    const newFilters = new Set(statusFilters);
+    if (newFilters.has(status)) {
+      newFilters.delete(status);
+    } else {
+      newFilters.add(status);
+    }
+    setStatusFilters(newFilters);
+  };
 
   // Process data with filters
   const processedData = useMemo(() => {
@@ -97,7 +121,8 @@ const KtloDashboard: React.FC = () => {
         }
       }
 
-      if (statusFilter !== 'All' && item.Status !== statusFilter) return false;
+      const itemStatus = item.Status || 'Not Started';
+      if (statusFilters.size > 0 && !statusFilters.has(itemStatus)) return false;
 
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
@@ -195,7 +220,7 @@ const KtloDashboard: React.FC = () => {
         completed: filtered.filter(item => item.Status === 'Completed')
       }
     };
-  }, [searchTerm, statusFilter, fiscalYearFilter]);
+  }, [searchTerm, statusFilters, fiscalYearFilter]);
 
   const handleDrillDown = (items: KTLOItem[], title: string) => {
     setDrillDownData({ items, title });
@@ -220,8 +245,19 @@ const KtloDashboard: React.FC = () => {
             </div>
             <div className="flex items-center space-x-4">
               <div className="hidden md:block text-right">
-                <p className="text-xs text-slate-500">Financial Year 2026</p>
-                <p className="text-sm font-medium text-slate-700">Aug 2025 - Jul 2026</p>
+                {(() => {
+                  const fyDetails = getFiscalYearDetails(fiscalYearFilter);
+                  return (
+                    <>
+                      <p className="text-xs text-slate-500">{fyDetails.displayYear}</p>
+                      {fyDetails.startMonth && fyDetails.endMonth && (
+                        <p className="text-sm font-medium text-slate-700">
+                          {fyDetails.startMonth} - {fyDetails.endMonth}
+                        </p>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -234,7 +270,9 @@ const KtloDashboard: React.FC = () => {
         <div className="mb-8 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none z-10">
+                <Search className="text-slate-400 w-4 h-4" />
+              </div>
               <input
                 type="text"
                 placeholder="Search tasks, comments, PgM..."
@@ -245,7 +283,9 @@ const KtloDashboard: React.FC = () => {
             </div>
 
             <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none z-10">
+                <Calendar className="text-slate-400 w-4 h-4" />
+              </div>
               <select
                 value={fiscalYearFilter}
                 onChange={(e) => setFiscalYearFilter(e.target.value)}
@@ -258,18 +298,24 @@ const KtloDashboard: React.FC = () => {
               </select>
             </div>
 
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer transition-all"
-              >
-                <option value="All">All Statuses</option>
-                <option value="Completed">Completed</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Not Started">Not Started</option>
-              </select>
+            <div className="bg-white border border-slate-300 rounded-lg p-3">
+              <div className="flex items-center space-x-2 mb-2">
+                <Filter className="text-slate-400 w-4 h-4 flex-shrink-0" />
+                <span className="text-xs font-medium text-slate-600">Filter by Status:</span>
+              </div>
+              <div className="space-y-1.5">
+                {['Completed', 'In Progress', 'Not Started'].map(status => (
+                  <label key={status} className="flex items-center space-x-2 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={statusFilters.has(status)}
+                      onChange={() => toggleStatusFilter(status)}
+                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                    />
+                    <span className="text-sm text-slate-700 group-hover:text-slate-900">{status}</span>
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -429,7 +475,7 @@ const KtloDashboard: React.FC = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
                   outerRadius={100}
                   fill="#8884d8"
                   dataKey="value"
