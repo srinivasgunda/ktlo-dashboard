@@ -1,0 +1,30 @@
+[
+  {
+    "environment": "dev",
+    "autoMinorVersionUpgrade": true,
+    "dbInstanceIdentifier": "sample-dev-cluster-pg-13-1",
+    "engineVersion": "15.12",
+    "compliant": true
+  },
+  {
+    "environment": "dev",
+    "autoMinorVersionUpgrade": false,
+    "dbInstanceIdentifier": "sample-dev-cluster-old-1",
+    "engineVersion": "13.18",
+    "compliant": false
+  },
+  {
+    "environment": "test",
+    "autoMinorVersionUpgrade": true,
+    "dbInstanceIdentifier": "sample-test-cluster-1",
+    "engineVersion": "16.8",
+    "compliant": true
+  },
+  {
+    "environment": "staging",
+    "autoMinorVersionUpgrade": false,
+    "dbInstanceIdentifier": "sample-staging-cluster-1",
+    "engineVersion": "15.10",
+    "compliant": false
+  }
+]
