@@ -39,5 +39,6 @@ coverage/
 
 # Private data files
 src/ktlo-data.json
+src/aurora-data.json
 KTLO Tracker.xlsx
 *.xlsx
