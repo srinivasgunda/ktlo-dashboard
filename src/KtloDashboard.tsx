@@ -7,7 +7,7 @@ import {
 import {
   CheckCircle2, AlertTriangle, TrendingUp, Calendar, Filter, Search,
   ExternalLink, X, Clock, Users, FileText, Activity,
-  CheckSquare, Target, Zap, ArrowUpRight, BarChart3
+  CheckSquare, Target, Zap, ArrowUpRight
 } from 'lucide-react';
 import ktloData from './ktlo-data.json';
 
@@ -58,20 +58,6 @@ const getAllFiscalYears = (data: KTLOItem[]): string[] => {
     }
   });
   return Array.from(years).sort().reverse();
-};
-
-const getFiscalYearDetails = (fy: string): { year: number; displayYear: string; startMonth: string; endMonth: string } => {
-  if (fy === 'All') {
-    return { year: 0, displayYear: 'All Years', startMonth: '', endMonth: '' };
-  }
-  const yearNum = parseInt(fy.replace('FY', ''));
-  const fullYear = yearNum < 50 ? 2000 + yearNum : 1900 + yearNum;
-  return {
-    year: fullYear,
-    displayYear: `Financial Year ${fullYear}`,
-    startMonth: `Aug ${fullYear - 1}`,
-    endMonth: `Jul ${fullYear}`
-  };
 };
 
 const getUrgencyLevel = (item: KTLOItem): 'overdue' | 'urgent' | 'soon' | 'normal' => {
@@ -227,45 +213,8 @@ const KtloDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Modern Navbar */}
-      <nav className="bg-white border-b border-slate-200 sticky top-0 z-40 backdrop-blur-sm bg-white/95">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-white" />
-                </div>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-slate-900">KTLO Dashboard</h1>
-                <p className="text-xs text-slate-500">AWS Deprecations Tracker</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="hidden md:block text-right">
-                {(() => {
-                  const fyDetails = getFiscalYearDetails(fiscalYearFilter);
-                  return (
-                    <>
-                      <p className="text-xs text-slate-500">{fyDetails.displayYear}</p>
-                      {fyDetails.startMonth && fyDetails.endMonth && (
-                        <p className="text-sm font-medium text-slate-700">
-                          {fyDetails.startMonth} - {fyDetails.endMonth}
-                        </p>
-                      )}
-                    </>
-                  );
-                })()}
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <>
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Filters Section */}
         <div className="mb-8 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -784,7 +733,7 @@ const KtloDashboard: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
