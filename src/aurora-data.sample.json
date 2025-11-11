@@ -2,8 +2,10 @@
   {
     "environment": "dev",
     "autoMinorVersionUpgrade": true,
-    "dbInstanceIdentifier": "sample-dev-cluster-pg-13-1",
+    "dbInstanceIdentifier": "sample-dev-cluster-pg-15-1",
     "engineVersion": "15.12",
+    "owner": "sample",
+    "endOfStandardSupport": "2027-11-11",
     "compliant": true
   },
   {
@@ -11,6 +13,8 @@
     "autoMinorVersionUpgrade": false,
     "dbInstanceIdentifier": "sample-dev-cluster-old-1",
     "engineVersion": "13.18",
+    "owner": "sample",
+    "endOfStandardSupport": "2025-11-13",
     "compliant": false
   },
   {
@@ -18,6 +22,8 @@
     "autoMinorVersionUpgrade": true,
     "dbInstanceIdentifier": "sample-test-cluster-1",
     "engineVersion": "16.8",
+    "owner": "sample",
+    "endOfStandardSupport": "2028-11-09",
     "compliant": true
   },
   {
@@ -25,6 +31,17 @@
     "autoMinorVersionUpgrade": false,
     "dbInstanceIdentifier": "sample-staging-cluster-1",
     "engineVersion": "15.10",
+    "owner": "sample",
+    "endOfStandardSupport": "2027-11-11",
     "compliant": false
+  },
+  {
+    "environment": "prod",
+    "autoMinorVersionUpgrade": true,
+    "dbInstanceIdentifier": "sample-prod-cluster-1",
+    "engineVersion": "17.4",
+    "owner": "sample",
+    "endOfStandardSupport": "2029-11-09",
+    "compliant": true
   }
 ]
