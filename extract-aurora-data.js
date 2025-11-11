@@ -1,11 +1,18 @@
 import XLSX from 'xlsx';
 import fs from 'fs';
 
-const workbook = XLSX.readFile('/Users/sgunda/Downloads/KTLO AWS DB Version (Aurora) Deprecations.xlsx');
+const workbook = XLSX.readFile('/Users/sgunda/Downloads/KTLO AWS Minor DB Version (Aurora) Deprecations.xlsx');
 
 console.log('Sheet Names:', workbook.SheetNames);
 
 const allEnvironments = [];
+
+// Helper function to convert Excel date number to date string
+const excelDateToJSDate = (excelDate) => {
+  if (!excelDate || typeof excelDate !== 'number') return 'Unknown';
+  const date = new Date((excelDate - 25569) * 86400 * 1000);
+  return date.toISOString().split('T')[0];
+};
 
 // Process all sheets
 workbook.SheetNames.forEach(sheetName => {
@@ -20,25 +27,64 @@ workbook.SheetNames.forEach(sheetName => {
   console.log(`Total Rows: ${data.length}`);
 
   if (data.length > 0) {
-    // Parse the table structure - data is in pipe-separated format
+    // Parse the table structure - data is in pipe-separated format in column 0
+    // Owner is in column 7, EOL date is in column 6
     const parsed = [];
 
     for (let i = 0; i < data.length; i++) {
-      const row = data[i][0];
-      if (!row || typeof row !== 'string') continue;
+      const row = data[i];
+      const pipeData = row[0];
+      const eolDateExcel = row[6]; // Column 6 = End of Standard Support
+      const ownerData = row[7];     // Column 7 = Owner
+
+      if (!pipeData || typeof pipeData !== 'string') continue;
 
       // Skip header rows and separators
-      if (row.includes('AutoMinorVersionUpgrade') || row.match(/^\|[\s-]+\|/)) continue;
+      if (pipeData.includes('AutoMinorVersionUpgrade') || pipeData.match(/^\|[\s-]+\|/)) continue;
 
       // Parse pipe-separated values
-      const parts = row.split('|').map(p => p.trim()).filter(p => p);
+      const parts = pipeData.split('|').map(p => p.trim()).filter(p => p);
 
       if (parts.length >= 3) {
+        const version = parts[2];
+        const majorVersion = version.split('.')[0];
+        const dbIdentifier = parts[1];
+
+        // Get owner from column 7, fallback to extracting from identifier
+        let owner = 'Unknown';
+        if (ownerData && typeof ownerData === 'string' && ownerData.trim() !== '') {
+          owner = ownerData.trim();
+        } else {
+          // Fallback: extract from instance identifier
+          const ownerMatch = dbIdentifier.match(/^([^-]+)/);
+          owner = ownerMatch ? ownerMatch[1] : 'Unknown';
+        }
+
+        // Get EOL date from column 6, fallback to hardcoded dates
+        let eolDate = 'Unknown';
+        if (eolDateExcel && typeof eolDateExcel === 'number') {
+          eolDate = excelDateToJSDate(eolDateExcel);
+        } else {
+          // Fallback to PostgreSQL version EOL dates
+          const eolDates = {
+            '17': '2029-11-09',
+            '16': '2028-11-09',
+            '15': '2027-11-11',
+            '14': '2026-11-12',
+            '13': '2025-11-13',
+            '12': '2024-11-14',
+            '11': '2023-11-09',
+          };
+          eolDate = eolDates[majorVersion] || 'Unknown';
+        }
+
         parsed.push({
           environment: environment,
           autoMinorVersionUpgrade: parts[0] === 'True',
-          dbInstanceIdentifier: parts[1],
+          dbInstanceIdentifier: dbIdentifier,
           engineVersion: parts[2],
+          owner: owner,
+          endOfStandardSupport: eolDate,
           compliant: false // We'll determine this based on version
         });
       }
