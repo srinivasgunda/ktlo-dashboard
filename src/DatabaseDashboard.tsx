@@ -5,7 +5,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import {
-  Database, Server, AlertCircle, CheckCircle, Settings, X, Clock, Calendar
+  Database, Server, AlertCircle, CheckCircle, Settings, X, Clock, Calendar, RefreshCw
 } from 'lucide-react';
 
 // Type definitions
@@ -66,6 +66,32 @@ export const DatabaseDashboard: React.FC<DatabaseDashboardProps> = ({ auroraData
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [filterValue, setFilterValue] = useState<string>('');
   const tableRef = React.useRef<HTMLDivElement>(null);
+
+  // Check if data is available
+  if (!auroraData || auroraData.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full border-2 border-red-200">
+          <div className="flex items-center justify-center mb-4">
+            <AlertCircle className="w-16 h-16 text-red-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 mb-4 text-center">
+            No Database Data Available
+          </h2>
+          <p className="text-slate-600 mb-6 text-center">
+            The Aurora database data could not be loaded. Please ensure <code className="bg-slate-100 px-2 py-1 rounded text-sm">src/aurora-data.json</code> exists and contains valid data.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Reload Page
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const processedData = useMemo(() => {
     // Mark compliance status

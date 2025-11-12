@@ -7,9 +7,21 @@ import {
 import {
   CheckCircle2, AlertTriangle, TrendingUp, Calendar, Filter, Search,
   ExternalLink, X, Clock, Users, FileText, Activity,
-  CheckSquare, Target, Zap, ArrowUpRight
+  CheckSquare, Target, Zap, ArrowUpRight, AlertCircle, RefreshCw
 } from 'lucide-react';
-import ktloData from './ktlo-data.json';
+
+// Import with error handling
+let ktloData: any[] = [];
+try {
+  ktloData = require('./ktlo-data.json');
+  if (!Array.isArray(ktloData)) {
+    console.error('KTLO data is not an array');
+    ktloData = [];
+  }
+} catch (error) {
+  console.error('Failed to load KTLO data:', error);
+  ktloData = [];
+}
 
 // Type definitions
 interface KTLOItem {
@@ -83,6 +95,41 @@ const KtloDashboard: React.FC = () => {
     items: KTLOItem[];
     title: string;
   } | null>(null);
+
+  // Check if data is available
+  if (!ktloData || ktloData.length === 0) {
+    return (
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full border-2 border-red-200">
+            <div className="flex items-center justify-center mb-4">
+              <AlertCircle className="w-16 h-16 text-red-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4 text-center">
+              No Data Available
+            </h2>
+            <p className="text-slate-600 mb-6 text-center">
+              The KTLO dashboard data file could not be loaded. Please ensure <code className="bg-slate-100 px-2 py-1 rounded text-sm">src/ktlo-data.json</code> exists and contains valid data.
+            </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <p className="text-sm text-blue-900 font-semibold mb-2">To fix this:</p>
+              <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                <li>Run <code className="bg-blue-100 px-1 rounded">node extract-data.js</code></li>
+                <li>Or copy <code className="bg-blue-100 px-1 rounded">src/ktlo-data.sample.json</code> to <code className="bg-blue-100 px-1 rounded">src/ktlo-data.json</code></li>
+              </ol>
+            </div>
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Reload Page
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   const allFiscalYears = useMemo(() => getAllFiscalYears(ktloData as KTLOItem[]), []);
 
