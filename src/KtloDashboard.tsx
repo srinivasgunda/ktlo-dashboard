@@ -218,27 +218,27 @@ const KtloDashboard: React.FC = () => {
         {/* Filters Section */}
         <div className="mb-8 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none z-10">
-                <Search className="text-slate-400 w-4 h-4" />
+            <div className="relative flex items-center">
+              <div className="absolute left-3 pointer-events-none z-10">
+                <Search className="text-slate-400 w-5 h-5" />
               </div>
               <input
                 type="text"
                 placeholder="Search tasks, comments, PgM..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full pl-11 pr-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
 
-            <div className="relative">
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none z-10">
-                <Calendar className="text-slate-400 w-4 h-4" />
+            <div className="relative flex items-center">
+              <div className="absolute left-3 pointer-events-none z-10">
+                <Calendar className="text-slate-400 w-5 h-5" />
               </div>
               <select
                 value={fiscalYearFilter}
                 onChange={(e) => setFiscalYearFilter(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer transition-all"
+                className="w-full pl-11 pr-10 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer transition-all"
               >
                 <option value="All">All Fiscal Years</option>
                 {allFiscalYears.map(fy => (
