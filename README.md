@@ -3,17 +3,93 @@
 A modern, interactive dashboard for managing and visualizing KTLO (Keep The Lights On) tasks, specifically focused on AWS deprecations and infrastructure updates.
 
 ![Dashboard Preview](https://img.shields.io/badge/Status-Production%20Ready-success)
-![React](https://img.shields.io/badge/React-18-blue)
+![React](https://img.shields.io/badge/React-19-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![Tests](https://img.shields.io/badge/Tests-Vitest-yellow)
 ![License](https://img.shields.io/badge/License-MIT-green)
+
+## 📑 Table of Contents
+
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Development](#development)
+- [Testing](#testing)
+- [Data Management](#data-management)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [Troubleshooting](#troubleshooting)
+
+## ✨ Features
+
+### 🎯 Two Interactive Dashboards
+
+#### 1. KTLO Tasks Dashboard
+- **Real-time filtering** by search, status, and fiscal year
+- **Visual metrics cards** showing total tasks, triage rate, CCS actions, and completion
+- **Interactive charts** for status distribution and task assignments
+- **Timeline urgency tracking** (overdue, 7 days, 30 days, 90 days)
+- **Drill-down capability** - click any chart or metric to see detailed task lists
+- **Task detail modals** with full information and Jira integration
+
+#### 2. Database Versions Dashboard
+- **Aurora PostgreSQL version tracking** across environments
+- **Compliance monitoring** with end-of-life date tracking
+- **Environment filtering** (Production, Staging, Development)
+- **Auto-upgrade status** visibility
+- **Version distribution** charts and metrics
+- **Critical EOL alerts** for databases needing urgent attention
+
+### 🔍 Advanced Features
+
+- **Smart Search**: Full-text search across task names, comments, and program managers
+- **Multiple Filters**: Combine search, status, and fiscal year filters
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Error Handling**: Graceful handling of missing or invalid data
+- **Tab Navigation**: Easy switching between KTLO and Database dashboards
+- **Visual Indicators**: Color-coded urgency levels and status badges
 
 ## 🚀 Quick Start
 
-The dashboard is now running at: **http://localhost:5173/**
+### Prerequisites
+
+- **Node.js** 18+ and npm
+- **Git** for version control
+
+### Installation
 
 ```bash
-# Start the development server
+# Clone the repository
+git clone https://github.com/srinivasgunda/ktlo-dashboard.git
+cd ktlo-dashboard
+
+# Install dependencies
+npm install
+
+# Set up data file
+cp src/ktlo-data.sample.json src/ktlo-data.json
+
+# Start development server
 npm run dev
+```
+
+The dashboard will be available at **http://localhost:5173/**
+
+## 💻 Development
+
+### Available Scripts
+
+```bash
+# Start development server with hot reload
+npm run dev
+
+# Run tests
+npm test
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage report
+npm run test:coverage
 
 # Build for production
 npm run build
@@ -22,237 +98,346 @@ npm run build
 npm run preview
 ```
 
-## 📊 Dashboard Features
+### Project Architecture
 
-### Key Metrics Cards
-- **Total KTLO Tasks**: Overview of all tasks for FY26 (Aug 2025 - July 2026)
-- **Triaged Tasks**: Number and percentage of tasks that have been reviewed
-- **Needs CCS Action**: Tasks requiring action from the CCS team
-- **Completed Tasks**: Track completion rate and progress
+This is a **Static SPA (Single Page Application)** built with:
+- **React 19** - UI framework
+- **TypeScript** - Type-safe development
+- **Vite** - Fast build tool and dev server
+- **Recharts** - Interactive data visualization
+- **Lucide React** - Modern icon library
+- **Vitest** - Unit and integration testing
 
-### Interactive Visualizations
+### Development Workflow
 
-#### 1. Status Distribution (Pie Chart)
-- Visual breakdown of tasks by status (Completed, In Progress, Not Started)
-- Click segments to see detailed information
-- Hover for exact counts and percentages
-
-#### 2. Upcoming Deadlines (Bar Chart)
-- Color-coded timeline view:
-  - 🔴 **Overdue** - Tasks past their due date
-  - 🟠 **This Week** - Urgent items due within 7 days
-  - 🟡 **This Month** - Items due within 30 days
-  - 🟢 **This Quarter** - Items due within 90 days
-
-#### 3. Tasks by Program Manager (Bar Chart)
-- Workload distribution across team members
-- Identify bottlenecks and balance assignments
-
-#### 4. Top AWS Services (Horizontal Bar Chart)
-- Most frequently deprecated services
-- Helps prioritize learning and preparation
-
-### Advanced Features
-
-#### 🔍 Search & Filter
-- **Full-text search**: Search by task name or comments
-- **Status filter**: Filter by Completed, In Progress, Not Started, or All
-- Real-time filtering with instant results
-
-#### 🚨 Urgent Alerts
-- Automatic notification banner for:
-  - Overdue tasks
-  - Tasks due within the next week
-- Highly visible red alert box at the top
-
-#### 📋 Interactive Task List
-- Sortable table with all task details
-- Color-coded status badges
-- Click any row to open detailed modal
-- Overdue tasks highlighted in red background
-
-#### 💬 Detailed Task Modal
-- Click any task to see full details:
-  - Complete description and comments
-  - All metadata (PgM, dates, status, etc.)
-  - Action requirements
-  - Timeline information
-
-## 🎨 Color Coding System
-
-- 🔴 **Red**: Overdue or critical items
-- 🟠 **Orange**: Action needed from CCS
-- 🟢 **Green**: Completed tasks
-- 🔵 **Blue**: In Progress tasks
-- 🟡 **Yellow**: Not Started tasks
-
-## 📁 Data Management
-
-### Updating Your Data
-
-Your KTLO data is currently stored in `src/ktlo-data.json`, which was automatically extracted from your Excel file.
-
-#### Option 1: Manual Update (Recommended for now)
-When you update your Excel tracker:
+1. **Make changes** to source files in `src/`
+2. **Vite hot-reloads** automatically
+3. **Write tests** in `src/test/`
+4. **Run tests** to ensure quality
+5. **Build** before deployment
 
 ```bash
-# Re-extract data from Excel
+# Typical workflow
+npm run dev          # Start dev server
+npm test             # Run tests in watch mode
+npm run build        # Build for production
+```
+
+### Environment Setup
+
+The app runs entirely in the browser (client-side). No backend server required.
+
+## 🧪 Testing
+
+### Test Structure
+
+```
+src/test/
+├── setup.ts                 # Test configuration
+├── utils.test.ts            # Unit tests for utilities
+└── KtloDashboard.test.tsx   # Integration tests for dashboard
+```
+
+### Running Tests
+
+```bash
+# Run all tests in watch mode
+npm test
+
+# Run tests once (CI mode)
+npm test -- --run
+
+# Run tests with coverage
+npm run test:coverage
+
+# Open test UI in browser
+npm run test:ui
+```
+
+### Test Coverage
+
+Tests include:
+- ✅ Utility function unit tests
+- ✅ Data validation tests
+- ✅ Error state handling tests
+- ✅ Component integration tests
+- ✅ Date formatting and fiscal year calculations
+
+### Writing Tests
+
+Example test:
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+
+describe('MyComponent', () => {
+  it('should render correctly', () => {
+    render(<MyComponent />);
+    expect(screen.getByText('Hello')).toBeInTheDocument();
+  });
+});
+```
+
+## 📊 Data Management
+
+### Data Sources
+
+The dashboard reads from two JSON files:
+
+1. **`src/ktlo-data.json`** - KTLO tasks data (git-ignored)
+2. **`src/aurora-data.json`** - Aurora database instances
+
+### Updating KTLO Data
+
+#### Option 1: Extract from Excel (Recommended)
+
+```bash
+# Extract data from your Excel tracker
 node extract-data.js
 ```
 
-This will automatically update `src/ktlo-data.json` with the latest data from:
-`/Users/sgunda/Downloads/KTLO Tracker.xlsx`
+This reads from `/Users/sgunda/Downloads/KTLO Tracker.xlsx` by default.
 
-#### Option 2: Update Excel Path
-If you move your Excel file, edit `extract-data.js` and update line 5:
+#### Option 2: Manual Edit
 
-```javascript
-const workbook = XLSX.readFile('/path/to/your/KTLO Tracker.xlsx');
+Edit `src/ktlo-data.json` directly with your task data.
+
+#### Option 3: Use Sample Data
+
+```bash
+# Copy sample data for testing
+cp src/ktlo-data.sample.json src/ktlo-data.json
 ```
 
-### Data Structure
+### Data Schema
 
-Your Excel file is expected to have these columns:
-- `KTLO Item` - Task name/description
-- `Received On` - Date task was received (Excel date format)
-- `Triaged` - Yes/No/In Progress
-- `Action Needed from CCS` - Yes/No
-- `Status` - Completed/In Progress/Not Started
-- `PgM Assigned` - Program Manager name
-- `Due Date` - Task deadline (Excel date format)
-- `Comments` - Additional notes and details
+#### KTLO Tasks
 
-## 🛠️ Technology Stack
+```json
+{
+  "KTLO Item": "Task name",
+  "Received On": 45292,        // Excel date number
+  "Triaged": "Yes",             // Yes/No/In Progress
+  "Action Needed from CCS": "Yes",
+  "Status": "Completed",        // Completed/In Progress/Not Started
+  "PgM Assigned": "John Doe",
+  "Due Date": 45350,            // Excel date number
+  "Comments": "Details here GWCP-12345"
+}
+```
 
-- **Frontend Framework**: React 18 with TypeScript
-- **Build Tool**: Vite 7
-- **Charts**: Recharts (responsive, interactive charts)
-- **Icons**: Lucide React
-- **Excel Parsing**: xlsx library
-- **Styling**: Custom CSS with Tailwind-inspired utilities
+#### Aurora Database
 
-## 📈 Insights & Analytics
+```json
+{
+  "environment": "Production",
+  "autoMinorVersionUpgrade": true,
+  "dbInstanceIdentifier": "my-database",
+  "engineVersion": "15.4",
+  "owner": "TeamName",
+  "endOfStandardSupport": "2027-11-09",
+  "compliant": true
+}
+```
 
-The dashboard automatically calculates and displays:
+### Error Handling
 
-1. **Completion Rate**: Percentage of tasks marked as completed
-2. **Triage Rate**: Percentage of tasks that have been reviewed
-3. **Workload Distribution**: Tasks per Program Manager
-4. **Service Impact**: Which AWS services are most affected
-5. **Timeline Urgency**: Categorized upcoming deadlines
-6. **Risk Indicators**: Overdue tasks and urgent items
+If data files are missing or invalid:
+- ✅ Dashboard shows helpful error message
+- ✅ Instructions provided to fix the issue
+- ✅ Reload button to retry after fixing
+- ✅ No crash or blank screens
 
-## 🔧 Customization
+## 📁 Project Structure
 
-### Adding New Visualizations
-
-Edit `src/KtloDashboard.tsx` to add custom charts or metrics. The dashboard uses Recharts, which supports:
-- Bar Charts, Pie Charts, Line Charts
-- Area Charts, Scatter Plots, Radar Charts
-- And many more...
-
-### Adjusting Time Periods
-
-Current fiscal year is defined in the header. To change:
-- Edit the text in the dashboard header (line ~217)
-- Dates are automatically calculated from current date
-
-### Color Scheme
-
-Update colors in the `processedData` section:
-- Status colors (lines ~150-154)
-- Timeline colors (lines ~157-162)
-
-## 📱 Responsive Design
-
-The dashboard is fully responsive and works on:
-- Desktop computers (optimal experience)
-- Tablets (iPad, etc.)
-- Mobile phones (stacked layout)
-
-## 🚀 Future Enhancements
-
-Possible improvements:
-1. **File Upload**: Drag-and-drop Excel files directly in the browser
-2. **Data Export**: Download filtered/searched results
-3. **Historical Trends**: Track completion rates over time
-4. **Email Alerts**: Automatic notifications for upcoming deadlines
-5. **Multi-user Support**: Different views for different teams
-6. **API Integration**: Direct connection to project management tools
-7. **Dark Mode**: Toggle between light and dark themes
-
-## 🐛 Troubleshooting
-
-**Dashboard shows no data:**
-- Check that `src/ktlo-data.json` exists
-- Verify the JSON file is not empty
-- Run `node extract-data.js` to regenerate
-
-**Charts not displaying:**
-- Clear browser cache
-- Check browser console for errors
-- Ensure all dependencies are installed: `npm install`
-
-**Excel extraction fails:**
-- Verify Excel file path in `extract-data.js`
-- Ensure Excel file is not open in another program
-- Check that column headers match expected names
-
-## 📄 License
-
-This dashboard was created for internal use by the CCS team.
-
-## 👨‍💻 Support
-
-For questions or issues:
-1. Check the browser console for errors
-2. Review the data in `src/ktlo-data.json`
-3. Verify Excel file format matches expected structure
-
----
-
-
-## 📁 Data Setup
-
-### First Time Setup
-
-The dashboard uses sample data by default. To use your own data:
-
-1. **Copy the sample file:**
-   ```bash
-   cp src/ktlo-data.sample.json src/ktlo-data.json
-   ```
-
-2. **Extract from your Excel file:**
-   ```bash
-   # Update the Excel path in extract-data.js first
-   node extract-data.js
-   ```
-
-3. **Or manually edit** `src/ktlo-data.json` with your task data
-
-**Note**: `src/ktlo-data.json` is git-ignored to keep your actual task data private.
-
-## 👥 Author
-
-**Srinivas Gunda**
-- GitHub: [@srinivasgunda](https://github.com/srinivasgunda)
-- Email: nivasg@gmail.com
+```
+ktlo-dashboard/
+├── src/
+│   ├── App.tsx                    # Main app with tab navigation
+│   ├── KtloDashboard.tsx          # KTLO tasks dashboard
+│   ├── DatabaseDashboard.tsx      # Database versions dashboard
+│   ├── main.tsx                   # React entry point
+│   ├── style.css                  # Global styles
+│   ├── ktlo-data.json            # Your KTLO data (git-ignored)
+│   ├── ktlo-data.sample.json     # Sample data
+│   ├── aurora-data.json          # Database data
+│   └── test/
+│       ├── setup.ts              # Test configuration
+│       ├── utils.test.ts         # Unit tests
+│       └── KtloDashboard.test.tsx # Integration tests
+├── public/                        # Static assets
+├── index.html                     # HTML entry point
+├── vite.config.ts                # Vite configuration
+├── vitest.config.ts              # Test configuration
+├── tsconfig.json                 # TypeScript configuration
+├── package.json                  # Dependencies and scripts
+├── extract-data.js               # Excel to JSON converter
+└── README.md                     # This file
+```
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome!
+### Setup for Contributors
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Clone your fork
+3. Create a feature branch
+4. Make your changes
+5. Add tests for new features
+6. Run tests to ensure everything works
+7. Submit a pull request
+
+```bash
+git checkout -b feature/amazing-feature
+git commit -m 'feat: add amazing feature'
+git push origin feature/amazing-feature
+```
+
+### Coding Standards
+
+- Use **TypeScript** for type safety
+- Follow **React best practices** (hooks, functional components)
+- Write **tests** for new features
+- Use **meaningful commit messages** (conventional commits)
+- Ensure **no console errors** in development
+- Test on **multiple browsers**
+
+### Commit Message Format
+
+```
+<type>: <description>
+
+[optional body]
+```
+
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+
+Examples:
+- `feat: add database filtering by owner`
+- `fix: correct icon alignment in search boxes`
+- `docs: update README with testing instructions`
+- `test: add unit tests for date utilities`
+
+## 🐛 Troubleshooting
+
+### Dashboard shows "No Data Available"
+
+**Cause**: Missing or empty data file
+
+**Solution**:
+```bash
+# Option 1: Extract from Excel
+node extract-data.js
+
+# Option 2: Use sample data
+cp src/ktlo-data.sample.json src/ktlo-data.json
+
+# Then refresh browser
+```
+
+### Charts not displaying
+
+**Cause**: Browser cache or build issue
+
+**Solution**:
+```bash
+# Clear browser cache (Cmd+Shift+R or Ctrl+Shift+R)
+# Or rebuild
+npm run build
+npm run preview
+```
+
+### Tests failing
+
+**Cause**: Missing dependencies or outdated packages
+
+**Solution**:
+```bash
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+
+# Run tests again
+npm test
+```
+
+### Dev server won't start
+
+**Cause**: Port 5173 already in use
+
+**Solution**:
+```bash
+# Kill process on port 5173
+lsof -ti:5173 | xargs kill -9
+
+# Or use different port
+npm run dev -- --port 3000
+```
+
+### Excel extraction fails
+
+**Causes & Solutions**:
+
+1. **File not found**:
+   ```bash
+   # Update path in extract-data.js line 5
+   const workbook = XLSX.readFile('/correct/path/to/KTLO Tracker.xlsx');
+   ```
+
+2. **File is open**:
+   - Close Excel file
+   - Run extraction again
+
+3. **Wrong column names**:
+   - Ensure Excel columns match expected schema
+   - See Data Schema section above
+
+### Build errors
+
+**Cause**: TypeScript errors or missing types
+
+**Solution**:
+```bash
+# Check for TypeScript errors
+npx tsc --noEmit
+
+# Fix errors shown in output
+# Then build again
+npm run build
+```
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 👨‍💻 Author
+
+**Srinivas Gunda**
+- GitHub: [@srinivasgunda](https://github.com/srinivasgunda)
+- Email: nivasg@gmail.com
+
+## 🙏 Acknowledgments
+
+- React and TypeScript teams for excellent tooling
+- Recharts for beautiful chart components
+- Lucide for modern icon library
+- Vite for blazing fast development experience
+
+## 📈 Roadmap
+
+Future enhancements:
+- [ ] Deployment to GWCP Platform
+- [ ] Realtime data refresh by querying Atmos CLI using TeamCity or GitHub Actions Runners
+- [ ] Export filtered data to CSV/Excel
+- [ ] Historical trend analysis
+- [ ] Email notifications for deadlines
+- [ ] Multi-user authentication
+
 ## ⭐ Show Your Support
 
 Give a ⭐️ if this project helped you!
+
+---
+
+**Need help?** Open an issue on GitHub or contact the author.
