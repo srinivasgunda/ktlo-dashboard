@@ -29,32 +29,47 @@ function App() {
         </div>
       </nav>
 
-      {/* Tab Navigation */}
-      <div className="bg-white border-b border-slate-200">
+      {/* Tab Navigation - Enhanced with visual prominence */}
+      <div className="bg-gradient-to-r from-slate-50 to-slate-100 border-b-2 border-slate-300 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
-            <button
-              onClick={() => setActiveTab('tasks')}
-              className={`flex items-center gap-2 px-1 py-4 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === 'tasks'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-              }`}
-            >
-              <List className="w-4 h-4" />
-              KTLO Tasks
-            </button>
-            <button
-              onClick={() => setActiveTab('databases')}
-              className={`flex items-center gap-2 px-1 py-4 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === 'databases'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-              }`}
-            >
-              <Database className="w-4 h-4" />
-              Database Versions
-            </button>
+          <div className="py-2">
+            <div className="flex space-x-1">
+              <button
+                onClick={() => setActiveTab('tasks')}
+                className={`flex items-center gap-2 px-6 py-3 rounded-t-lg font-semibold text-sm transition-all duration-200 ${
+                  activeTab === 'tasks'
+                    ? 'bg-white text-blue-600 shadow-lg border-t-4 border-blue-500 transform -translate-y-1'
+                    : 'bg-transparent text-slate-600 hover:bg-white/50 hover:text-slate-900 border-t-4 border-transparent'
+                }`}
+              >
+                <List className={`w-5 h-5 ${activeTab === 'tasks' ? 'animate-pulse-once' : ''}`} />
+                <span>KTLO Tasks</span>
+                {activeTab === 'tasks' && (
+                  <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
+                    Active
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('databases')}
+                className={`flex items-center gap-2 px-6 py-3 rounded-t-lg font-semibold text-sm transition-all duration-200 ${
+                  activeTab === 'databases'
+                    ? 'bg-white text-blue-600 shadow-lg border-t-4 border-blue-500 transform -translate-y-1'
+                    : 'bg-transparent text-slate-600 hover:bg-white/50 hover:text-slate-900 border-t-4 border-transparent'
+                }`}
+              >
+                <Database className={`w-5 h-5 ${activeTab === 'databases' ? 'animate-pulse-once' : ''}`} />
+                <span>Database Versions</span>
+                {activeTab === 'databases' && (
+                  <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
+                    Active
+                  </span>
+                )}
+              </button>
+            </div>
+            <div className="text-xs text-slate-500 italic mt-2 ml-1">
+              ↑ Click tabs above to switch between dashboards
+            </div>
           </div>
         </div>
       </div>
