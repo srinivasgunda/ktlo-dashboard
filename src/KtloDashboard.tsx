@@ -10,18 +10,9 @@ import {
   CheckSquare, Target, Zap, ArrowUpRight, AlertCircle, RefreshCw
 } from 'lucide-react';
 
-// Import with error handling
-let ktloData: any[] = [];
-try {
-  ktloData = require('./ktlo-data.json');
-  if (!Array.isArray(ktloData)) {
-    console.error('KTLO data is not an array');
-    ktloData = [];
-  }
-} catch (error) {
-  console.error('Failed to load KTLO data:', error);
-  ktloData = [];
-}
+// Import data - falls back to empty array if import fails
+import ktloDataImport from './ktlo-data.json';
+const ktloData: any[] = Array.isArray(ktloDataImport) ? ktloDataImport : [];
 
 // Type definitions
 interface KTLOItem {
