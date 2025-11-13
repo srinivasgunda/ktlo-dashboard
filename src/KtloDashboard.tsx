@@ -9,9 +9,19 @@ import {
   CheckSquare, Target, Zap, ArrowUpRight, AlertCircle, RefreshCw
 } from 'lucide-react';
 
-// Import data - falls back to empty array if import fails
-import ktloDataImport from './ktlo-data.json';
-const ktloData: any[] = Array.isArray(ktloDataImport) ? ktloDataImport : [];
+// Import data with fallback to sample data
+import sampleData from './ktlo-data.sample.json';
+
+// Try to dynamically import ktlo-data.json, fallback to sample
+let ktloData: any[] = [];
+const dataModules = import.meta.glob('./ktlo-data.json', { eager: true, import: 'default' });
+if (dataModules['./ktlo-data.json']) {
+  const imported = dataModules['./ktlo-data.json'] as any;
+  ktloData = Array.isArray(imported) ? imported : [];
+} else {
+  // Use sample data as fallback
+  ktloData = Array.isArray(sampleData) ? sampleData : [];
+}
 
 // Type definitions
 interface KTLOItem {

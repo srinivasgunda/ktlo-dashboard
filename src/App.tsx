@@ -2,8 +2,14 @@ import { useState } from 'react';
 import { Database, List, BarChart3 } from 'lucide-react';
 import KtloDashboard from './KtloDashboard';
 import { DatabaseDashboard } from './DatabaseDashboard';
-import auroraData from './aurora-data.json';
+import auroraDataSample from './aurora-data.sample.json';
 import './style.css';
+
+// Import aurora data with fallback to sample data
+const dataModules = import.meta.glob('./aurora-data.json', { eager: true, import: 'default' });
+const auroraData = dataModules['./aurora-data.json']
+  ? (dataModules['./aurora-data.json'] as any)
+  : auroraDataSample;
 
 function App() {
   const [activeTab, setActiveTab] = useState<'tasks' | 'databases'>('tasks');

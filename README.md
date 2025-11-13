@@ -65,18 +65,13 @@ cd ktlo-dashboard
 # Install dependencies
 npm install
 
-# Set up environment configuration (optional - for custom port)
-cp .env.example .env.local
-# Edit .env.local to set VITE_PORT if needed (default: 5173)
-
-# Set up data file
-cp src/ktlo-data.sample.json src/ktlo-data.json
-
-# Start development server
+# Start development server (uses sample data automatically)
 npm run dev
 ```
 
 The dashboard will be available at **http://localhost:5173/** (or your configured port)
+
+**Note:** The app automatically uses sample data on first run. To use your own data, see [Data Management](#data-management) section.
 
 ## 💻 Development
 
@@ -204,14 +199,29 @@ describe('MyComponent', () => {
 
 ## 📊 Data Management
 
+### Automatic Sample Data
+
+**Zero Configuration Required!** The dashboard automatically uses sample data when you first clone and run the app. This means anyone can:
+
+1. Clone the repo
+2. Run `npm install && npm run dev`
+3. Immediately see the dashboard with demo data
+
+No manual file copying needed!
+
 ### Data Sources
 
-The dashboard reads from two JSON files:
+The dashboard uses an intelligent fallback system:
 
-1. **`src/ktlo-data.json`** - KTLO tasks data (git-ignored)
-2. **`src/aurora-data.json`** - Aurora database instances
+1. **`src/ktlo-data.json`** - Your real KTLO tasks (git-ignored)
+   - If exists: Uses your data
+   - If missing: Automatically falls back to `src/ktlo-data.sample.json`
 
-### Updating KTLO Data
+2. **`src/aurora-data.json`** - Your real Aurora database instances (git-ignored)
+   - If exists: Uses your data
+   - If missing: Automatically falls back to `src/aurora-data.sample.json`
+
+### Adding Your Own Data
 
 #### Option 1: Extract from Excel (Recommended)
 
@@ -220,18 +230,15 @@ The dashboard reads from two JSON files:
 node extract-data.js
 ```
 
-This reads from `/Users/sgunda/Downloads/KTLO Tracker.xlsx` by default.
+This reads from `/Users/sgunda/Downloads/KTLO Tracker.xlsx` by default and creates `src/ktlo-data.json`.
 
 #### Option 2: Manual Edit
 
-Edit `src/ktlo-data.json` directly with your task data.
+Create or edit `src/ktlo-data.json` directly with your task data.
 
-#### Option 3: Use Sample Data
+#### Option 3: Keep Using Sample Data
 
-```bash
-# Copy sample data for testing
-cp src/ktlo-data.sample.json src/ktlo-data.json
-```
+No action needed - sample data works out of the box for demos and testing!
 
 ### Data Schema
 
