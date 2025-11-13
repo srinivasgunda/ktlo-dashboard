@@ -65,6 +65,10 @@ cd ktlo-dashboard
 # Install dependencies
 npm install
 
+# Set up environment configuration (optional - for custom port)
+cp .env.example .env.local
+# Edit .env.local to set VITE_PORT if needed (default: 5173)
+
 # Set up data file
 cp src/ktlo-data.sample.json src/ktlo-data.json
 
@@ -72,7 +76,7 @@ cp src/ktlo-data.sample.json src/ktlo-data.json
 npm run dev
 ```
 
-The dashboard will be available at **http://localhost:5174/**
+The dashboard will be available at **http://localhost:5173/** (or your configured port)
 
 ## 💻 Development
 
@@ -126,6 +130,25 @@ npm run build        # Build for production
 ### Environment Setup
 
 The app runs entirely in the browser (client-side). No backend server required.
+
+#### Port Configuration
+
+The development server port can be customized using the `VITE_PORT` environment variable:
+
+1. **Default**: Port 5173 (if no `.env.local` exists)
+2. **Custom**: Create `.env.local` and set `VITE_PORT=5174` (or any port)
+3. **Git-ignored**: `.env.local` is never committed, so each repo can have its own port
+
+**Example for running multiple repos simultaneously:**
+```bash
+# Personal repo - uses port 5174
+echo "VITE_PORT=5174" > .env.local
+
+# Company repo - uses default 5173 (or create .env.local with VITE_PORT=5173)
+# No .env.local needed, will use default
+```
+
+This allows you to sync code between repos without port conflicts.
 
 ## 🧪 Testing
 
@@ -364,14 +387,18 @@ npm test
 
 ### Dev server won't start
 
-**Cause**: Port 5174 already in use
+**Cause**: Port already in use
 
 **Solution**:
 ```bash
-# Kill process on port 5174
-lsof -ti:5174 | xargs kill -9
+# Option 1: Change port in .env.local
+echo "VITE_PORT=3000" > .env.local
+npm run dev
 
-# Or use different port
+# Option 2: Kill process on the port
+lsof -ti:5173 | xargs kill -9  # or 5174, depending on your config
+
+# Option 3: Use command line override
 npm run dev -- --port 3000
 ```
 
