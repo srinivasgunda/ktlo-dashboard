@@ -344,11 +344,18 @@ const KtloDashboard: React.FC = () => {
           </div>
 
           {/* Triaged */}
-          <div className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg transition-all">
+          <div
+            onClick={() => handleDrillDown(
+              processedData.filtered.filter(item => item.Triaged === 'Yes'),
+              'Triaged Tasks'
+            )}
+            className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg transition-all cursor-pointer group"
+          >
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                 <CheckSquare className="w-6 h-6 text-emerald-600" />
               </div>
+              <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" />
             </div>
             <h3 className="text-sm font-medium text-slate-600 mb-1">Triaged</h3>
             <p className="text-3xl font-bold text-slate-900">{processedData.metrics.triaged}</p>
