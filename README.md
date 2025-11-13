@@ -444,13 +444,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - GitHub: [@srinivasgunda](https://github.com/srinivasgunda)
 - Email: nivasg@gmail.com
 
-## 🙏 Acknowledgments
-
-- React and TypeScript teams for excellent tooling
-- Recharts for beautiful chart components
-- Lucide for modern icon library
-- Vite for blazing fast development experience
-
 ## 📈 Roadmap
 
 Future enhancements:
