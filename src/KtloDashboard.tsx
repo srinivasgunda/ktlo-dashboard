@@ -1,12 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import {
-  BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip,
+  PieChart, Pie, Cell, Tooltip,
   ResponsiveContainer
 } from 'recharts';
 import {
   CheckCircle2, AlertTriangle, TrendingUp, Calendar, Filter, Search,
-  ExternalLink, X, Clock, Users, FileText, Activity,
+  ExternalLink, X, Clock, FileText, Activity,
   CheckSquare, Target, Zap, ArrowUpRight, AlertCircle, RefreshCw
 } from 'lucide-react';
 
@@ -200,19 +199,21 @@ const KtloDashboard: React.FC = () => {
       return daysUntilDue > 30 && daysUntilDue <= 90;
     });
 
-    const pgmCounts: { [key: string]: number } = {};
-    filtered.forEach(item => {
-      const pgm = item['PgM Assigned'] || 'Unassigned';
-      pgmCounts[pgm] = (pgmCounts[pgm] || 0) + 1;
-    });
-    const pgmData = Object.entries(pgmCounts)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count);
-
     const statusData = [
       { name: 'Completed', value: completed, color: '#10b981' },
       { name: 'In Progress', value: inProgress, color: '#3b82f6' },
       { name: 'Not Started', value: notStarted, color: '#f59e0b' }
+    ].filter(item => item.value > 0);
+
+    // Triage status breakdown
+    const triageYes = filtered.filter(item => item.Triaged === 'Yes').length;
+    const triageNo = filtered.filter(item => item.Triaged === 'No' || !item.Triaged).length;
+    const triageInProgress = filtered.filter(item => item.Triaged === 'In Progress').length;
+
+    const triageData = [
+      { name: 'Triaged', value: triageYes, color: '#10b981' },
+      { name: 'Not Triaged', value: triageNo, color: '#ef4444' },
+      { name: 'In Progress', value: triageInProgress, color: '#f59e0b' }
     ].filter(item => item.value > 0);
 
     return {
@@ -233,7 +234,7 @@ const KtloDashboard: React.FC = () => {
       },
       charts: {
         statusData,
-        pgmData
+        triageData
       },
       lists: {
         overdue,
@@ -493,33 +494,41 @@ const KtloDashboard: React.FC = () => {
             <p className="text-xs text-center text-slate-500 mt-2">Click segments to filter tasks</p>
           </div>
 
-          {/* Tasks by PgM */}
+          {/* Triage Status Breakdown */}
           <div className="bg-white rounded-lg border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-slate-900">Tasks by Program Manager</h2>
-              <Users className="w-5 h-5 text-slate-400" />
+              <h2 className="text-lg font-semibold text-slate-900">Triage Status Breakdown</h2>
+              <CheckSquare className="w-5 h-5 text-slate-400" />
             </div>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={processedData.charts.pgmData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip />
-                <Bar
-                  dataKey="count"
-                  fill="#3b82f6"
-                  radius={[6, 6, 0, 0]}
+              <PieChart>
+                <Pie
+                  data={processedData.charts.triageData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="value"
                   onClick={(data) => {
-                    const items = processedData.filtered.filter(
-                      item => (item['PgM Assigned'] || 'Unassigned') === data.name
-                    );
-                    handleDrillDown(items, `${data.name}'s Tasks`);
+                    const items = processedData.filtered.filter(item => {
+                      if (data.name === 'Triaged') return item.Triaged === 'Yes';
+                      if (data.name === 'In Progress') return item.Triaged === 'In Progress';
+                      return item.Triaged === 'No' || !item.Triaged;
+                    });
+                    handleDrillDown(items, `${data.name} Tasks`);
                   }}
                   style={{ cursor: 'pointer' }}
-                />
-              </BarChart>
+                >
+                  {processedData.charts.triageData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
             </ResponsiveContainer>
-            <p className="text-xs text-center text-slate-500 mt-2">Click bars to view tasks</p>
+            <p className="text-xs text-center text-slate-500 mt-2">Click segments to filter tasks</p>
           </div>
         </div>
 
