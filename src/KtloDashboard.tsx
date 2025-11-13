@@ -6,7 +6,7 @@ import {
 import {
   CheckCircle2, AlertTriangle, TrendingUp, Calendar, Filter, Search,
   ExternalLink, X, Clock, FileText, Activity,
-  CheckSquare, Target, Zap, ArrowUpRight, AlertCircle, RefreshCw
+  CheckSquare, Target, Zap, ArrowUpRight, AlertCircle, RefreshCw, Users
 } from 'lucide-react';
 
 // Import data with fallback to sample data
@@ -33,6 +33,7 @@ interface KTLOItem {
   'Comments'?: string;
   'Due Date'?: number | string;
   'PgM Assigned'?: string;
+  'Pod Owner'?: string;
 }
 
 // Utility functions
@@ -86,10 +87,16 @@ const getUrgencyLevel = (item: KTLOItem): 'overdue' | 'urgent' | 'soon' | 'norma
   return 'normal';
 };
 
+// Custom label for pie charts - show only percentage inside, full name in tooltip
+const renderPieLabel = ({ percent }: any) => {
+  return `${(percent * 100).toFixed(0)}%`;
+};
+
 const KtloDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set(['Completed', 'In Progress', 'Not Started']));
   const [fiscalYearFilter, setFiscalYearFilter] = useState<string>('FY26');
+  const [podOwnerFilter, setPodOwnerFilter] = useState<string>('All');
   const [selectedItem, setSelectedItem] = useState<KTLOItem | null>(null);
   const [drillDownData, setDrillDownData] = useState<{
     items: KTLOItem[];
@@ -143,6 +150,16 @@ const KtloDashboard: React.FC = () => {
     setStatusFilters(newFilters);
   };
 
+  // Get all unique pod owners
+  const allPodOwners = useMemo(() => {
+    const pods = new Set<string>();
+    (ktloData as KTLOItem[]).forEach(item => {
+      const pod = item['Pod Owner'] || 'Unassigned';
+      pods.add(pod);
+    });
+    return Array.from(pods).sort();
+  }, []);
+
   // Process data with filters
   const processedData = useMemo(() => {
     let filtered = (ktloData as KTLOItem[]).filter(item => {
@@ -157,12 +174,19 @@ const KtloDashboard: React.FC = () => {
       const itemStatus = item.Status || 'Not Started';
       if (statusFilters.size > 0 && !statusFilters.has(itemStatus)) return false;
 
+      // Pod Owner filter
+      if (podOwnerFilter !== 'All') {
+        const itemPod = item['Pod Owner'] || 'Unassigned';
+        if (itemPod !== podOwnerFilter) return false;
+      }
+
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
         const itemText = item['KTLO Item'].toLowerCase();
         const comments = (item.Comments || '').toLowerCase();
         const pgm = (item['PgM Assigned'] || '').toLowerCase();
-        if (!itemText.includes(search) && !comments.includes(search) && !pgm.includes(search)) {
+        const pod = (item['Pod Owner'] || '').toLowerCase();
+        if (!itemText.includes(search) && !comments.includes(search) && !pgm.includes(search) && !pod.includes(search)) {
           return false;
         }
       }
@@ -226,6 +250,24 @@ const KtloDashboard: React.FC = () => {
       { name: 'In Progress', value: triageInProgress, color: '#f59e0b' }
     ].filter(item => item.value > 0);
 
+    // Pod Owner distribution - pie chart format
+    const podCounts: { [key: string]: number } = {};
+    filtered.forEach(item => {
+      const pod = item['Pod Owner'] || 'Unassigned';
+      podCounts[pod] = (podCounts[pod] || 0) + 1;
+    });
+
+    // Generate colors for pie chart (use a nice color palette)
+    const podColors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#6366f1', '#ef4444', '#14b8a6', '#f97316'];
+
+    const podData = Object.entries(podCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count], index) => ({
+        name,
+        value: count,
+        color: podColors[index % podColors.length]
+      }));
+
     return {
       filtered,
       metrics: {
@@ -244,7 +286,8 @@ const KtloDashboard: React.FC = () => {
       },
       charts: {
         statusData,
-        triageData
+        triageData,
+        podData
       },
       lists: {
         overdue,
@@ -255,7 +298,7 @@ const KtloDashboard: React.FC = () => {
         completed: filtered.filter(item => item.Status === 'Completed')
       }
     };
-  }, [searchTerm, statusFilters, fiscalYearFilter]);
+  }, [searchTerm, statusFilters, fiscalYearFilter, podOwnerFilter]);
 
   const handleDrillDown = (items: KTLOItem[], title: string) => {
     setDrillDownData({ items, title });
@@ -266,7 +309,7 @@ const KtloDashboard: React.FC = () => {
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Filters Section */}
         <div className="mb-8 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="relative flex items-center">
               <div className="absolute left-3 pointer-events-none z-10">
                 <Search className="text-slate-400 w-5 h-5" />
@@ -292,6 +335,22 @@ const KtloDashboard: React.FC = () => {
                 <option value="All">All Fiscal Years</option>
                 {allFiscalYears.map(fy => (
                   <option key={fy} value={fy}>{fy}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="relative flex items-center">
+              <div className="absolute left-3 pointer-events-none z-10">
+                <Users className="text-slate-400 w-5 h-5" />
+              </div>
+              <select
+                value={podOwnerFilter}
+                onChange={(e) => setPodOwnerFilter(e.target.value)}
+                className="w-full pl-11 pr-10 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer transition-all"
+              >
+                <option value="All">All Pod Owners</option>
+                {allPodOwners.map(pod => (
+                  <option key={pod} value={pod}>{pod}</option>
                 ))}
               </select>
             </div>
@@ -466,7 +525,7 @@ const KtloDashboard: React.FC = () => {
         </div>
 
         {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {/* Status Distribution */}
           <div className="bg-white rounded-lg border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-6">
@@ -480,8 +539,8 @@ const KtloDashboard: React.FC = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={100}
+                  label={renderPieLabel}
+                  outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
                   onClick={(data) => {
@@ -517,8 +576,8 @@ const KtloDashboard: React.FC = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={100}
+                  label={renderPieLabel}
+                  outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
                   onClick={(data) => {
@@ -540,6 +599,42 @@ const KtloDashboard: React.FC = () => {
             </ResponsiveContainer>
             <p className="text-xs text-center text-slate-500 mt-2">Click segments to filter tasks</p>
           </div>
+
+          {/* Pod Owner Distribution */}
+          <div className="bg-white rounded-lg border border-slate-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-slate-900">Tasks by Pod Owner</h2>
+              <Users className="w-5 h-5 text-slate-400" />
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={processedData.charts.podData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderPieLabel}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  onClick={(data) => {
+                    const items = processedData.filtered.filter(item => {
+                      const pod = item['Pod Owner'] || 'Unassigned';
+                      return pod === data.name;
+                    });
+                    handleDrillDown(items, `Tasks - ${data.name}`);
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {processedData.charts.podData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <p className="text-xs text-center text-slate-500 mt-2">Click segments to filter tasks by pod</p>
+          </div>
         </div>
 
         {/* Task Table */}
@@ -557,7 +652,7 @@ const KtloDashboard: React.FC = () => {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">Task</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">PgM</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">Pod Owner</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">Due Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">CCS</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">Jira</th>
@@ -590,7 +685,7 @@ const KtloDashboard: React.FC = () => {
                           {item.Status || 'Not Started'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-700">{item['PgM Assigned'] || 'Unassigned'}</td>
+                      <td className="px-6 py-4 text-sm text-slate-700">{item['Pod Owner'] || ''}</td>
                       <td className="px-6 py-4 text-sm">
                         {typeof item['Due Date'] === 'number' ? (
                           <span className={
@@ -686,9 +781,11 @@ const KtloDashboard: React.FC = () => {
                         }`}>
                           {item.Status || 'Not Started'}
                         </span>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-slate-100 text-slate-700">
-                          {item['PgM Assigned'] || 'Unassigned'}
-                        </span>
+                        {item['Pod Owner'] && (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-purple-100 text-purple-700">
+                            {item['Pod Owner']}
+                          </span>
+                        )}
                         {typeof item['Due Date'] === 'number' && (
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             urgency === 'overdue' ? 'bg-red-100 text-red-800' :
@@ -750,8 +847,8 @@ const KtloDashboard: React.FC = () => {
                   <p className="text-sm font-semibold text-slate-900">{selectedItem.Status || 'Not Started'}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-500 mb-1">Program Manager</p>
-                  <p className="text-sm font-semibold text-slate-900">{selectedItem['PgM Assigned'] || 'Unassigned'}</p>
+                  <p className="text-xs font-medium text-slate-500 mb-1">Pod Owner</p>
+                  <p className="text-sm font-semibold text-slate-900">{selectedItem['Pod Owner'] || ''}</p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-slate-500 mb-1">Triaged</p>
