@@ -72,7 +72,7 @@ cp src/ktlo-data.sample.json src/ktlo-data.json
 npm run dev
 ```
 
-The dashboard will be available at **http://localhost:5173/**
+The dashboard will be available at **http://localhost:5174/**
 
 ## 💻 Development
 
@@ -364,12 +364,12 @@ npm test
 
 ### Dev server won't start
 
-**Cause**: Port 5173 already in use
+**Cause**: Port 5174 already in use
 
 **Solution**:
 ```bash
-# Kill process on port 5173
-lsof -ti:5173 | xargs kill -9
+# Kill process on port 5174
+lsof -ti:5174 | xargs kill -9
 
 # Or use different port
 npm run dev -- --port 3000
