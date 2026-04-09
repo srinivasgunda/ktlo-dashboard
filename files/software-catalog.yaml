@@ -1,0 +1,25 @@
+ServiceId: KTLO-Dashboard
+CheckmarxProjectName: ‘KTLO-Dashboard’
+ServiceName: KTLO-Dashboard
+Description: ‘Dashboard for AWS deprecations and DB upgrades tracking’
+ServiceStatus: Active
+ExternalBusinessName: ‘Dashboard for AWS deprecations and DB upgrades tracking’
+RepoUrl: ‘https://github.com/gwre-pdo/ktlo-dashboard’
+JiraProjectKey: ‘’
+CIUrl: ‘’
+DepartmentCode: 275
+ApplicationOwner: Srinivas Gunda
+PodOwner: 
+BusinessOwner: ‘Srinivas Gunda’
+Type: "web app"
+ProductFamily: KTLO
+ReleaseCadence: continuously
+AppInCloudOrSelfManaged: Self managed
+Exposure: external
+GwreApplicationsDependentOn: None
+GwreApplicationsProvidesIntegrationTo: None
+BusinessRisk: Low
+SecurityRisk: Low
+SlackChannelName: ‘’
+ContactEmail: 'sgunda@guidewire.com'
+ServiceLifecycleStatus: Production
